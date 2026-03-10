@@ -45,9 +45,18 @@ def test_api_request_refreshes_when_token_is_dict():
     assert resp["headers"].get("Authorization") == "Bearer fresh-token"
 
 
-def test_api_request_dict_missing_access_token():
+def test_api_request_refreshes_when_OAuth2Token_access_token_is_None():
     c = Client()
-    c.oauth2_token = {"expires_at": 9999999999}
+    c.oauth2_token = OAuth2Token(access_token = None, expires_at = int(time.time()) + 3600)
+
+    resp = c.request("GET", "/me", api=True)
+
+    assert resp["headers"].get("Authorization") == "Bearer fresh-token"
+
+
+def test_api_request_refreshes_when_dict_access_token_is_None():
+    c = Client()
+    c.oauth2_token = {"access_token": None, "expires_at": int(time.time()) + 3600}
 
     resp = c.request("GET", "/me", api=True)
 

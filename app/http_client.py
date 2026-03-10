@@ -27,12 +27,16 @@ class Client:
             headers = {}
 
         if api:
-            if not self.oauth2_token or (isinstance(self.oauth2_token, OAuth2Token) and self.oauth2_token.expired) or (isinstance(self.oauth2_token, dict) and int(datetime.now(tz=timezone.utc).timestamp()) >= self.oauth2_token.get("expires_at")):
+            if not self.oauth2_token or (
+                isinstance(self.oauth2_token, OAuth2Token) and (not self.oauth2_token.access_token or self.oauth2_token.expired)) or (
+                isinstance(self.oauth2_token, dict) and (not self.oauth2_token.get("access_token") or int(datetime.now(tz=timezone.utc).timestamp()) >= self.oauth2_token.get("expires_at"))):
                 self.refresh_oauth2()
             if isinstance(self.oauth2_token, OAuth2Token):
                 headers["Authorization"] = self.oauth2_token.as_header()
             if isinstance(self.oauth2_token, dict):
-                headers["Authorization"] = f"Bearer {self.oauth2_token.get('access_token')}"
+                if self.oauth2_token.get("access_token"):
+                    headers["Authorization"] = f"Bearer {self.oauth2_token.get('access_token')}"
+
 
         req = requests.Request(method=method, url=f"https://example.com{path}", headers=headers)
         prepared = self.session.prepare_request(req)
