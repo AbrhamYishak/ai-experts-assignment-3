@@ -9,8 +9,8 @@ This project contains tests written using `pytest`. You can run the tests either
 ### Step 1: Clone the repo
 
 ```bash
-git clone
-cd
+git clone https://github.com/AbrhamYishak/ai-experts-assignment-3.git
+cd ai-experts-assignment-3
 ```
 
 ### Step 2: Create virtual environment (Optional)
@@ -37,7 +37,8 @@ python -m pytest -v
 ### Step 1: Clone the repo
 
 ```bash
-git clone
+git clone https://github.com/AbrhamYishak/ai-experts-assignment-3.git
+cd ai-experts-assignment-3
 ```
 
 ### Step 2: Build the docker image
