@@ -1,14 +1,28 @@
-What were the bugs:
-    1, When the token was of type dict, there was no way to retrieve the access_token. As a result, the function       returned None, causing Test 5 to fail.
-    2, When the token was of type dict, stale tokens could not be refreshed. This also caused Test 5 to fail.
-Why did this happend:
-    1, The first bug happend because in the if api statements we were checking if token is instance of OAuth2Token or if token is not None. we jumped over the case when token is type dict which made the Authorization in the header None
-    2, The second bug happend because we requested for refresh token only when the token is None or when the token is type of OAuth2Token and is expired but we did not request when the token is type dict and expired.
-Why does your fix actually solve it:
-    1, The first solution work because it handle the case when token is type of dict and set header["Authorization"] to "Bearer + access_token"
-    2, The second solution work because it extends the existing if condition to support tokens of type dict. It verifies whether the expiration time has passed and triggers a token refresh when necessary.
-What’s one realistic case / edge case your tests still don’t cover:
-    1, When the token is a dict but does not contain required fields such as access_token or expires_at. The current tests assume these fields exist, so malformed token dictionaries are not tested.
-    2, When the token is a dict but the expires_at value has an invalid format (for example a string that cannot be parsed into a valid date or timestamp).
-    3, When the token is unexpected type instead of a dict or token object or None.
+# Bug Analysis and Fix Explanation
 
+## What were the bugs
+
+1. When the token was of type `dict`, there was no way to retrieve the `access_token`. As a result, the function returned `None`, causing **Test 5** to fail.
+2. When the token was of type `dict`, stale tokens could not be refreshed. This also caused **Test 5** to fail.
+
+---
+
+## Why did this happen
+
+1. The first bug happened because in the `if api` statements, we only checked if the token was an instance of `OAuth2Token` or if it was not `None`. The case where the token was of type `dict` was skipped, which caused the `Authorization` header to be `None`.
+2. The second bug happened because the refresh logic only triggered when the token was `None` or when it was an expired `OAuth2Token`. Tokens of type `dict` that were expired did not trigger a refresh.
+
+---
+
+## Why the fix solves the problem
+
+1. The first solution works because it handles the case when the token is of type `dict` and sets `header["Authorization"]` to `"Bearer " + access_token`.
+2. The second solution works because it extends the existing condition to support tokens of type `dict`. It checks whether the token has expired and triggers a refresh when necessary.
+
+---
+
+## Realistic edge cases not yet covered by tests
+
+1. Tokens that are `dict` but **missing required fields** like `access_token` or `expires_at`. Current tests assume these fields exist, so malformed token dictionaries are not tested.
+2. Tokens that are `dict` but have an **invalid `expires_at` format** (for example, a string that cannot be parsed into a valid date or timestamp).
+3. Tokens of an **unexpected type** (neither `dict`, `OAuth2Token`, nor `None`).
